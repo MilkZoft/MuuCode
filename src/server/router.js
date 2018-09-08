@@ -1,5 +1,5 @@
 // Configuration
-import { $app, $baseUrl, $dashboard, $isLocal, $theme } from '@configuration';
+import { $app, $baseUrl, $dashboard, $theme } from '@configuration';
 
 // Utils
 import {
@@ -182,33 +182,4 @@ export default (app) => {
 
   // Disabling x-powered-by
   app.disable('x-powered-by');
-
-  // catch 404 and forward to error handler
-  app.use((req, res, next) => {
-    const err = new Error('Not Found');
-    err.status = 404;
-    return next(err);
-  });
-
-  // development error handler
-  if ($isLocal()) {
-    app.use((err, req, res) => {
-      console.log(err); // eslint-disable-line
-
-      res.status(err.status || 500);
-      res.render('error', {
-        message: err.message,
-        error: err
-      });
-    });
-  }
-
-  // production error handler
-  app.use((err, req, res) => {
-    res.status(err.status || 500);
-    res.render('error', {
-      message: err.message,
-      error: {}
-    });
-  });
 };

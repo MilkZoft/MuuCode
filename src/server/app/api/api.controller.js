@@ -1,4 +1,5 @@
 // Dependencies
+import 'babel-polyfill';
 import express from 'express';
 
 // Utils
