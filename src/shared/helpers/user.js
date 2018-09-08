@@ -23,8 +23,6 @@ export function User(req, res) {
       };
     }
 
-    console.log('INSIDE====', user);
-
     if (isDefined(connectedUser) && (isDefined(res.session('oauth')) || user)) {
       const {
         network = false,
