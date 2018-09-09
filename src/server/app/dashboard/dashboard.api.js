@@ -7,7 +7,9 @@ export default (req, res, next) => {
       appParams = {},
       all,
       order,
-      orderBy
+      orderBy,
+      searchBy,
+      searchTerm
     } = apiParams;
 
     if (action === 'get') {
@@ -26,9 +28,21 @@ export default (req, res, next) => {
           }, result => callback(result, total));
       });
     } else if (action === 'search') {
-      res.dashboardModel
-        .cms(application)
-        .search({}, results => callback(results));
+      res.dashboardModel.cms(application).count(query, total => {
+        res.dashboardModel
+          .cms(application)
+          .search({
+            searchBy,
+            searchTerm,
+            params: {
+              all,
+              order,
+              orderBy,
+              total,
+              page: appParams.page || 0
+            }
+          }, results => callback(results));
+      });
     }
   }
 

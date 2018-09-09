@@ -70,22 +70,22 @@ export function escapeString(str) {
  * @returns {*} sanitizedData
  */
 export function sanitize(data) {
-  let isQuery = false;
-  const sanitizedData = {};
+  let sanitizedData = {};
 
   if (isObject(data)) {
     if (data.query) {
-      isQuery = true;
-      data = data.query;
+      sanitizedData = Object.assign({}, data);
+
+      forEach(data.query, key => {
+        sanitizedData.query[key] = clean(data.query[key]);
+      });
+    } else {
+      forEach(data, key => {
+        sanitizedData[key] = clean(data[key]);
+      });
     }
 
-    forEach(data, key => {
-      sanitizedData[key] = clean(data[key]);
-    });
-
-    return isQuery
-      ? { query: sanitizedData }
-      : sanitizedData;
+    return sanitizedData;
   } else if (isString(data)) {
     return clean(data);
   }

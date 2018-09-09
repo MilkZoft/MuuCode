@@ -306,9 +306,45 @@ export default (req, res, next) => {
       Model.findByQuery(data, result => cb(result));
     }
 
+    function search(requestData, cb) {
+      const {
+        searchBy,
+        searchTerm,
+        params: {
+          page,
+          total = 0,
+          all = false,
+          order: orderDirection = 'desc',
+          orderBy = false
+        }
+      } = requestData;
+
+      const limit = !all ? getPaginationLimit(page, total) : '';
+
+      if (orderBy) {
+        order = `${orderBy} ${orderDirection}`;
+      }
+
+      const data = {
+        table: application,
+        fields: '*',
+        searchBy: [searchBy],
+        searchTerm,
+        order,
+        limit,
+        debug: {
+          filename,
+          method: 'search'
+        }
+      };
+
+      Model.search(data, result => cb(result));
+    }
+
     return {
       count,
-      get
+      get,
+      search
     };
   }
 

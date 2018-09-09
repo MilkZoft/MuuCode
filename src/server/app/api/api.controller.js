@@ -20,7 +20,9 @@ Router.get('/:application', (req, res) => {
     query,
     all = false,
     order,
-    orderBy
+    orderBy,
+    searchBy,
+    searchTerm
   } = sanitize(req.query);
 
   const apiParams = {
@@ -30,7 +32,9 @@ Router.get('/:application', (req, res) => {
     query,
     all,
     order,
-    orderBy
+    orderBy,
+    searchBy,
+    searchTerm
   };
 
   if (!unauthorizedApps.includes(application)) {
