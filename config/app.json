@@ -110,6 +110,7 @@
         "backend": false
       },
       "users": {
+        "private": true,
         "frontend": true,
         "backend": true,
         "dashboard": {

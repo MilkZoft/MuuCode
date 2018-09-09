@@ -1,15 +1,18 @@
 // Dependencies
 import express from 'express';
 
+// Configuration
+import { $app } from '@configuration';
+
 // Utils
 import { isFunction } from '@utils/is';
 import { camelCase, sanitize } from '@utils/string';
 
-// Unallowed Applications
-const unauthorizedApps = ['users'];
-
 // Express Router
 const Router = express.Router();
+
+// Allowed Apps
+const allowedApps = $app().allowed;
 
 Router.get('/:application', (req, res) => {
   const { application } = req.params;
@@ -36,7 +39,7 @@ Router.get('/:application', (req, res) => {
     searchTerm
   };
 
-  if (!unauthorizedApps.includes(application)) {
+  if (allowedApps[application] && !allowedApps[application].private) {
     res.dashboardAPI.get(apiParams, (response, rows) => {
       if (response) {
         res.json({
