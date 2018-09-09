@@ -39,7 +39,15 @@ export function removeHTML(str) {
  * @returns {string} Cleaned string.
  */
 export function clean(str) {
-  return removeHTML(str).replace(/[`ª´·¨Ç~¿!#$%^&*()|+=?;'",<>{}[\]\\]/gi, '');
+  const value = removeHTML(str).replace(/[`ª´·¨Ç~¿!#$%^&*()|+=?;'",<>{}[\]\\]/gi, '');
+
+  if (value === 'true') {
+    return true;
+  } else if (value === 'false') {
+    return false;
+  }
+
+  return value;
 }
 
 /**
@@ -62,19 +70,26 @@ export function escapeString(str) {
  * @returns {*} sanitizedData
  */
 export function sanitize(data) {
+  let isQuery = false;
   const sanitizedData = {};
 
-  if (isString(data)) {
-    return clean(data);
-  }
-
   if (isObject(data)) {
+    if (data.query) {
+      isQuery = true;
+      data = data.query;
+    }
+
     forEach(data, key => {
       sanitizedData[key] = clean(data[key]);
     });
 
-    return sanitizedData;
+    return isQuery
+      ? { query: sanitizedData }
+      : sanitizedData;
+  } else if (isString(data)) {
+    return clean(data);
   }
+
 
   return false;
 }

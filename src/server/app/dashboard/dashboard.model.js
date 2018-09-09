@@ -30,7 +30,7 @@ export default (req, res, next) => {
   // * Global vars
   const table = currentApp;
   const { fields } = schema;
-  const order = 'id desc';
+  let order = 'id desc';
   const searchBy = fields.split(', ');
   const filename = 'dashboard.model.js';
 
@@ -112,7 +112,7 @@ export default (req, res, next) => {
         order,
         limit,
         debug: {
-          filename,
+          filename: __filename,
           method: 'getRows'
         }
       };
@@ -129,7 +129,7 @@ export default (req, res, next) => {
         table,
         id,
         debug: {
-          filename,
+          filename: __filename,
           method: 'getRow'
         }
       };
@@ -268,8 +268,53 @@ export default (req, res, next) => {
     };
   }
 
+  function cms(application) {
+    function count(data, cb) {
+      Model.countAllRowsFrom({ table, ...data }, total => cb(total));
+    }
+
+    function get(requestData, cb) {
+      const {
+        params: {
+          order: orderDirection = 'desc',
+          orderBy = false,
+          page,
+          total = 0,
+          all = false
+        },
+        query
+      } = requestData;
+
+      const limit = !all ? getPaginationLimit(page, total) : '';
+
+      if (orderBy) {
+        order = `${orderBy} ${orderDirection}`;
+      }
+
+      const data = {
+        table: application,
+        fields: '*',
+        order,
+        limit,
+        query,
+        debug: {
+          filename: __filename,
+          method: 'get'
+        }
+      };
+
+      Model.findByQuery(data, result => cb(result));
+    }
+
+    return {
+      count,
+      get
+    };
+  }
+
   // Methods
   res.dashboardModel = {
+    cms,
     dashboard
   };
 

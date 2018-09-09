@@ -6,8 +6,57 @@ import express from 'express';
 import { isFunction, isDefined } from '@utils/is';
 import { camelCase, sanitize } from '@utils/string';
 
+// Unallowed Applications
+const unauthorizedApps = ['users'];
+
 // Express Router
 const Router = express.Router();
+
+Router.get('/:application', (req, res) => {
+  const { application } = req.params;
+  const {
+    action = 'get',
+    appParams,
+    query,
+    all = false,
+    order,
+    orderBy
+  } = sanitize(req.query);
+
+  const apiParams = {
+    application,
+    action,
+    appParams,
+    query,
+    all,
+    order,
+    orderBy
+  };
+
+  if (!unauthorizedApps.includes(application)) {
+    res.dashboardAPI.get(apiParams, (response, rows) => {
+      if (response) {
+        res.json({
+          information: {
+            total: response.length,
+            rows,
+            apiParams
+          },
+          response
+        });
+      } else {
+        res.json({
+          error: true
+        });
+      }
+    });
+  } else {
+    res.json({
+      error: true,
+      message: 'Unauthorized'
+    });
+  }
+});
 
 // GET Method
 Router.get('/blog/:endpoint*?', (req, res) => {
@@ -29,35 +78,6 @@ Router.get('/blog/:endpoint*?', (req, res) => {
       } else if (response && format === 'xml') {
         res.set('Content-Type', 'text/xml');
         res.send(response);
-      } else {
-        res.json({
-          error: true
-        });
-      }
-    });
-  }
-
-  return res.json({
-    error: true
-  });
-});
-
-Router.get('/pages/:endpoint*?', (req, res) => {
-  const endpointMethod = camelCase(req.params.endpoint);
-  const data = sanitize(req.query);
-
-  if (isFunction(res.pagesAPI[endpointMethod])) {
-    return res.pagesAPI[endpointMethod](data, (cache, response, rows, format = 'json') => {
-      if (response && format === 'json') {
-        res.json({
-          information: {
-            cache,
-            total: response.length,
-            rows,
-            params: data
-          },
-          response
-        });
       } else {
         res.json({
           error: true

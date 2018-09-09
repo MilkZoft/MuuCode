@@ -1,5 +1,5 @@
 // Configuration
-import { $app, $baseUrl, $dashboard, $theme } from '@configuration';
+import { $app, $baseUrl, $dashboard, $isLocal, $theme } from '@configuration';
 
 // Utils
 import {
@@ -182,4 +182,16 @@ export default (app) => {
 
   // Disabling x-powered-by
   app.disable('x-powered-by');
+
+  if ($isLocal()) {
+    app.use((err, req, res) => {
+      console.log(err); // eslint-disable-line
+
+      res.status(err.status || 500);
+      res.render('error', {
+        message: err.message,
+        error: err
+      });
+    });
+  }
 };
