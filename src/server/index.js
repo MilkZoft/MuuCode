@@ -1,4 +1,5 @@
 // Dependencies
+import 'babel-polyfill';
 import bodyParser from 'body-parser';
 import connectBusboy from 'connect-busboy';
 import cookieParser from 'cookie-parser';
