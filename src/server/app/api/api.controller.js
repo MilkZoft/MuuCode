@@ -16,6 +16,7 @@ const allowedApps = $app().allowed;
 
 Router.get('/:application', (req, res) => {
   const { application } = req.params;
+  const allowedApp = allowedApps[application];
   const {
     action = 'get',
     appParams,
@@ -41,7 +42,7 @@ Router.get('/:application', (req, res) => {
     fields
   };
 
-  if (allowedApps[application] && !allowedApps[application].private) {
+  if (allowedApp && !allowedApp.private && allowedApp.actions.read) {
     res.dashboardAPI.get(apiParams, (response, rows) => {
       if (response) {
         res.json({
