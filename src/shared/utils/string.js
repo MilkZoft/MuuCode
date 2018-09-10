@@ -39,7 +39,7 @@ export function removeHTML(str) {
  * @returns {string} Cleaned string.
  */
 export function clean(str) {
-  const value = removeHTML(str).replace(/[`ª´·¨Ç~¿!#$%^&*()|+=?;'",<>{}[\]\\]/gi, '');
+  const value = removeHTML(str).replace(/[`ª´·¨Ç~¿!#$%^&*()|+=?;'"<>{}[\]\\]/gi, '');
 
   if (value === 'true') {
     return true;
