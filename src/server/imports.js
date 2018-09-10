@@ -3,7 +3,7 @@ import dashboardAPI from './app/dashboard/dashboard.api';
 import usersAPI from './app/users/users.api';
 
 // Importing Dashboards
-import appDashboard from './app/dashboard/app.dashboard';
+import appDashboard from './app/dashboard/dashboard.app';
 
 // Importing Models
 import dashboardModel from './app/dashboard/dashboard.model';

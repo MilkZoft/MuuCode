@@ -280,7 +280,8 @@ export default (req, res, next) => {
           orderBy = false,
           page,
           total = 0,
-          all = false
+          all = false,
+          fields = '*'
         },
         query
       } = requestData;
@@ -293,7 +294,7 @@ export default (req, res, next) => {
 
       const data = {
         table: application,
-        fields: '*',
+        fields,
         order,
         limit,
         query,
@@ -310,6 +311,7 @@ export default (req, res, next) => {
       const {
         searchBy,
         searchTerm,
+        fields = '*',
         params: {
           page,
           total = 0,
@@ -327,7 +329,7 @@ export default (req, res, next) => {
 
       const data = {
         table: application,
-        fields: '*',
+        fields,
         searchBy: [searchBy],
         searchTerm,
         order,

@@ -24,7 +24,8 @@ Router.get('/:application', (req, res) => {
     order,
     orderBy,
     searchBy,
-    searchTerm
+    searchTerm,
+    fields
   } = sanitize(req.query);
 
   const apiParams = {
@@ -36,7 +37,8 @@ Router.get('/:application', (req, res) => {
     order,
     orderBy,
     searchBy,
-    searchTerm
+    searchTerm,
+    fields
   };
 
   if (allowedApps[application] && !allowedApps[application].private) {

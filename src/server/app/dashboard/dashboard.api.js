@@ -9,7 +9,8 @@ export default (req, res, next) => {
       order,
       orderBy,
       searchBy,
-      searchTerm
+      searchTerm,
+      fields
     } = apiParams;
 
     if (action === 'get') {
@@ -22,7 +23,8 @@ export default (req, res, next) => {
               order,
               orderBy,
               total,
-              page: appParams.page || 0
+              page: appParams.page || 0,
+              fields
             },
             query
           }, result => callback(result, total));
@@ -39,7 +41,8 @@ export default (req, res, next) => {
               order,
               orderBy,
               total,
-              page: appParams.page || 0
+              page: appParams.page || 0,
+              fields
             }
           }, results => callback(results));
       });
