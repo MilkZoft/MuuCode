@@ -43,28 +43,13 @@ export default (app) => {
   // i18n
   app.use((req, res, next) => {
     const currentLanguage = getCurrentLanguage(req.url);
-    const cacheKey = `contentCache(${currentLanguage})`;
 
-    // Returning cache if exists...
-    res.cache.exists(cacheKey, exists => {
-      if (exists) {
-        res.cache.get(cacheKey, data => {
-          res.__ = res.locals.__ = data;
-          res.locals.content = JSON.stringify(res.__);
-          res.locals.currentLanguage = currentLanguage;
+    loadLanguage(currentLanguage, data => {
+      res.__ = res.locals.__ = data;
+      res.locals.content = JSON.stringify(res.__);
+      res.locals.currentLanguage = currentLanguage;
 
-          return next();
-        });
-      } else {
-        loadLanguage(currentLanguage, data => {
-          res.cache.set(cacheKey, data);
-          res.__ = res.locals.__ = data;
-          res.locals.content = JSON.stringify(res.__);
-          res.locals.currentLanguage = currentLanguage;
-
-          return next();
-        });
-      }
+      return next();
     });
   });
 
@@ -72,7 +57,6 @@ export default (app) => {
   app.use((req, res, next) => {
     res.currentApp = getCurrentApp(req.originalUrl);
     res.currentDashboardApp = res.locals.currentDashboardApp = getCurrentApp(req.originalUrl, true);
-    res.currentUrl = $baseUrl() + req.originalUrl;
     res.baseUrl = res.locals.baseUrl = $baseUrl();
     req.basePath = res.locals.basePath = `${$baseUrl()}${getLanguagePath(req.url)}`;
 
