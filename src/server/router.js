@@ -168,14 +168,34 @@ export default (app) => {
   app.disable('x-powered-by');
 
   if ($isLocal()) {
-    app.use((err, req, res) => {
-      console.log(err); // eslint-disable-line
+    app.use((err, req, res, next) => {
+      console.log(err); // eslint-disable-line no-console
 
       res.status(err.status || 500);
+
       res.render('error', {
         message: err.message,
         error: err
       });
+
+      next();
     });
   }
+
+  app.use((req, res, next) => {
+    const err = new Error('Not Found');
+    err.status = 404;
+    return next(err);
+  });
+
+  app.use((err, req, res, next) => {
+    res.status(err.status || 500);
+
+    res.render('error', {
+      message: err.message,
+      error: {}
+    });
+
+    next();
+  });
 };
