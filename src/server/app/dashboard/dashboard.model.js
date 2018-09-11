@@ -18,7 +18,7 @@ const utils = {
 };
 
 export default (req, res, next) => {
-  const currentApp = getCurrentApp(req.originalUrl, true);
+  let currentApp = getCurrentApp(req.originalUrl, true);
   const app = $app().allowed[currentApp];
 
   if (!app || !app.backend) {
@@ -95,7 +95,7 @@ export default (req, res, next) => {
   function dashboard(application) {
     if (application) {
       const { schema } = $app().allowed[currentApp];
-
+      currentApp = application;
       getRequiredFields(schema);
     }
 
@@ -229,11 +229,17 @@ export default (req, res, next) => {
     }
 
     function updateRow(data, cb) {
+      const { id = res.currentId } = data;
+
+      if (data.id) {
+        delete data.id;
+      }
+
       const fields = keys(data);
       let edit = true;
       const errorMessages = {};
       const validateIfExists = {
-        id: res.currentId
+        id
       };
 
       // Removing year, month and day for blog
@@ -259,7 +265,7 @@ export default (req, res, next) => {
             return Model.updateRow(
               table,
               data,
-              res.currentId,
+              id,
               cb,
               (result, cb) => cb(result)
             );

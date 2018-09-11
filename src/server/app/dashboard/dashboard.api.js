@@ -65,11 +65,20 @@ export default (req, res, next) => {
       .removeRow(id, result => callback(result));
   }
 
+  function put(apiParams, callback) {
+    const { application, body } = apiParams;
+
+    res.dashboardModel
+      .dashboard(application)
+      .updateRow(body, result => callback(result));
+  }
+
   // Methods
   res.dashboardAPI = {
     get,
     post,
-    remove
+    remove,
+    put
   };
 
   return next();

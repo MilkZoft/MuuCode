@@ -14,6 +14,45 @@ const Router = express.Router();
 // Allowed Apps
 const allowedApps = $app().allowed;
 
+// PUT Method
+Router.put('/:application/:id', (req, res) => {
+  const { application, id } = req.params;
+  const allowedApp = allowedApps[application];
+
+  if (allowedApp && !allowedApp.private && allowedApp.actions.update) {
+    const data = sanitize(req.body);
+
+    const apiParams = {
+      application,
+      body: { id, ...data }
+    };
+
+    res.dashboardAPI.put(apiParams, (response, error) => {
+      if (response) {
+        res.json({
+          information: {
+            affectedRows: 1,
+            apiParams
+          },
+          response: {
+            updated: true
+          }
+        });
+      } else {
+        res.json({
+          error: true,
+          errorMessage: error
+        });
+      }
+    });
+  } else {
+    res.json({
+      error: true,
+      message: 'Unauthorized'
+    });
+  }
+});
+
 // DELETE Method
 Router.delete('/:application/:id', (req, res) => {
   const { application, id } = req.params;
