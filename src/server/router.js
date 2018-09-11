@@ -168,7 +168,7 @@ export default (app) => {
   app.disable('x-powered-by');
 
   if ($isLocal()) {
-    app.use((err, req, res, next) => {
+    app.use((err, req, res) => {
       console.log(err); // eslint-disable-line no-console
 
       res.status(err.status || 500);
@@ -177,8 +177,6 @@ export default (app) => {
         message: err.message,
         error: err
       });
-
-      next();
     });
   }
 
@@ -188,14 +186,12 @@ export default (app) => {
     return next(err);
   });
 
-  app.use((err, req, res, next) => {
+  app.use((err, req, res) => {
     res.status(err.status || 500);
 
     res.render('error', {
       message: err.message,
       error: {}
     });
-
-    next();
   });
 };
