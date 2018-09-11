@@ -14,6 +14,49 @@ const Router = express.Router();
 // Allowed Apps
 const allowedApps = $app().allowed;
 
+// DELETE Method
+Router.delete('/:application/:id', (req, res) => {
+  const { application, id } = req.params;
+  const allowedApp = allowedApps[application];
+
+  if (allowedApp && !allowedApp.private && allowedApp.actions.delete) {
+    const apiParams = {
+      application,
+      id
+    };
+
+    res.dashboardAPI.remove(apiParams, (response, error) => {
+      if (response) {
+        res.json({
+          information: {
+            affectedRows: 1,
+            apiParams
+          },
+          response: {
+            deleted: true
+          }
+        });
+      } else {
+        res.json({
+          error: true,
+          errorMessage: error
+        });
+      }
+    });
+  } else {
+    res.json({
+      error: true,
+      message: 'Unauthorized'
+    });
+  }
+});
+
+Router.delete('/:application/', (req, res) => {
+  res.send({
+    error: 'You must send the id, DELETE /:application/:id'
+  });
+});
+
 // POST Method
 Router.post('/:application', (req, res) => {
   const { application } = req.params;

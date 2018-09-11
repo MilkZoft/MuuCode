@@ -164,7 +164,7 @@ export default (req, res, next) => {
     }
 
     function removeRow(id, cb) {
-      Model.removeRow(table, id, () => cb());
+      Model.removeRow(table, id, () => cb(true));
     }
 
     function restoreAction(rows, cb) {
