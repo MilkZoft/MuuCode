@@ -44,14 +44,23 @@ export default (req, res, next) => {
               page: appParams.page || 0,
               fields
             }
-          }, results => callback(results));
+          }, results => callback(results, 1));
       });
     }
   }
 
+  function post(apiParams, callback) {
+    const { application, body } = apiParams;
+
+    res.dashboardModel
+      .dashboard(application)
+      .saveRow(body, (result, error = false) => callback(result, error));
+  }
+
   // Methods
   res.dashboardAPI = {
-    get
+    get,
+    post
   };
 
   return next();

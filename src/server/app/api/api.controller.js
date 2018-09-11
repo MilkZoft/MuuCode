@@ -14,6 +14,46 @@ const Router = express.Router();
 // Allowed Apps
 const allowedApps = $app().allowed;
 
+// POST Method
+Router.post('/:application', (req, res) => {
+  const { application } = req.params;
+  const allowedApp = allowedApps[application];
+
+  if (allowedApp && !allowedApp.private && allowedApp.actions.create) {
+    const data = sanitize(req.body);
+
+    const apiParams = {
+      application,
+      body: data
+    };
+
+    res.dashboardAPI.post(apiParams, (response, error) => {
+      if (response) {
+        res.json({
+          information: {
+            affectedRows: 1,
+            apiParams
+          },
+          response: {
+            inserted: true
+          }
+        });
+      } else {
+        res.json({
+          error: true,
+          errorMessage: error
+        });
+      }
+    });
+  } else {
+    res.json({
+      error: true,
+      message: 'Unauthorized'
+    });
+  }
+});
+
+// GET Method
 Router.get('/:application', (req, res) => {
   const { application } = req.params;
   const allowedApp = allowedApps[application];

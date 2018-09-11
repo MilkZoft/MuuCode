@@ -28,7 +28,7 @@ export default (req, res, next) => {
   const { schema } = app;
 
   // * Global vars
-  const table = currentApp;
+  let table = currentApp;
   const { fields } = schema;
   let order = 'id desc';
   const searchBy = fields.split(', ');
@@ -37,28 +37,34 @@ export default (req, res, next) => {
   // * Required fields
   res.content('Dashboard.forms.fields.error', true);
 
+  // * Hidden and required Elements
+  const hiddenElements = {};
   const requiredFields = {};
 
-  if (schema.required) {
-    schema.required.split(', ').forEach(field => {
-      requiredFields[field] = res.content(field);
-    });
-  }
+  const getRequiredFields = schema => {
+    if (schema.required) {
+      schema.required.split(', ').forEach(field => {
+        requiredFields[field] = res.content(field);
+      });
+    }
+  };
 
-  // * Hidden Elements
-  const hiddenElements = {};
+  const getHiddenElements = schema => {
+    if (schema.hidden) {
+      schema.hidden.split(', ').forEach(field => {
+        const [hiddenField, method] = field.split(':');
 
-  if (schema.hidden) {
-    schema.hidden.split(', ').forEach(field => {
-      const [hiddenField, method] = field.split(':');
+        hiddenElements[hiddenField] = '';
 
-      hiddenElements[hiddenField] = '';
+        if (method) {
+          hiddenElements[hiddenField] = utils[method]();
+        }
+      });
+    }
+  };
 
-      if (method) {
-        hiddenElements[hiddenField] = utils[method]();
-      }
-    });
-  }
+  getRequiredFields(schema);
+  getHiddenElements(schema);
 
   // Response data for table schema
   const resData = {
@@ -86,7 +92,13 @@ export default (req, res, next) => {
     };
   }
 
-  function dashboard() {
+  function dashboard(application) {
+    if (application) {
+      const { schema } = $app().allowed[currentApp];
+
+      getRequiredFields(schema);
+    }
+
     function count(cb) {
       Model.countAllRowsFrom({ table }, total => cb(total));
     }
@@ -168,17 +180,26 @@ export default (req, res, next) => {
       let save = true;
       const errorMessages = {};
 
-      forEach(fields, field => {
-        if (requiredFields[field] && data[field] === '') {
-          save = false;
-          errorMessages[field] = requiredFields[field];
-        }
-      });
+      table = application || table;
+
+      const enoughFields = keys(requiredFields).filter(x => !fields.includes(x));
+
+      if (enoughFields.length === 0) {
+        forEach(fields, field => {
+          if (requiredFields[field] && data[field] === '') {
+            save = false;
+            errorMessages[field] = requiredFields[field];
+          }
+        });
+      } else {
+        save = false;
+        errorMessages.error = `Missing fields: ${enoughFields.toString()}`;
+      }
 
       if (save) {
         Model.existsRow(table, validateIfExists(data), exists => {
           if (!exists) {
-            return Model.insertRow(table, data, cb, (result, cb) => cb(result));
+            return Model.insertRow(table, data, cb, (result, cb) => cb(result, {}));
           } else {
             return cb(false, 'exists');
           }
